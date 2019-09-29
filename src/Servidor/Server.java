@@ -1,6 +1,10 @@
 package Servidor;
 import java.io.*;
 import java.net.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 
@@ -41,12 +45,17 @@ public class Server {
 		/*
 		 * Choose file to send
 		 */
-		File dir = new File(Server.FILE_DIR);
-		File[] fileNames = dir.listFiles();
+		Path dir = Paths.get(Server.FILE_DIR);
+		DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir);
+	
+		//File dir = new File(Server.FILE_DIR);
+		File[] fileNames = new File[2];
 		System.out.println("Choose a file to send to users: ");
 		int fileCounter = 1;
-		for (File fileName : fileNames) {
-			System.out.println(fileCounter + "." + fileName.getName() + " " + fileName.length());
+		for (Path path : dirStream) {
+			File actualFile = path.toFile();
+			fileNames[fileCounter-1] = actualFile;
+			System.out.println(fileCounter + "." + actualFile.getName() + " " + actualFile.length());
 			fileCounter++;
 		}
 		while(true){
