@@ -16,7 +16,7 @@ public class Server {
 	public static int simultaneousClients = 25;
 	public static Integer succesfullFilesSent = 0;
 
-	public static void main(String argv[]) throws Exception {
+	public static void main(String args[]) throws Exception {
 		@SuppressWarnings("resource")
 		ServerSocket socket = new ServerSocket(SERVER_PORT);
 		serverProtocol(socket);
