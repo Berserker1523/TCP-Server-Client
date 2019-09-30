@@ -13,7 +13,7 @@ import Servidor.Server;
 
 public class Cliente {
 
-	private final static String SERVER_ADDRESS = "localhost";
+	private final static String SERVER_ADDRESS = "54.87.204.180";
 	private static DataOutputStream outToServer = null;
 	private static BufferedReader inFromServer = null;
 
