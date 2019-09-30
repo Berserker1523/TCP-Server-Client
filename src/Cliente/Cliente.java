@@ -87,9 +87,11 @@ public class Cliente {
 		
 		
 		System.out.println("DONE File Transfer ");
+		outToServer.writeBytes("R" + '\n');
+		System.out.println("TO SERVER Received");
 		
-		String fromServer = inFromServer.readLine();
-		System.out.println("Server hash: " + fromServer);
+		String serverHash = inFromServer.readLine();
+		System.out.println("Server hash: " + serverHash);
 		
 		File receipt = new File("./downloads/"+ nameFile);
 		//Use MD5 algorithm
@@ -98,6 +100,19 @@ public class Cliente {
 		//Get the checksum
 		String checksum = getFileChecksum(md5Digest, receipt);
 		System.out.println("Client hash: " + checksum);
+		
+		if(checksum.equals(serverHash)){
+			System.out.println("The server and client hashes are equal");
+			outToServer.writeBytes("E" + '\n');
+			System.out.println("TO SERVER hashEqual");
+		}
+		else{
+			if(checksum.equals(serverHash)){
+				System.out.println("The server and client hashes are equal");
+				outToServer.writeBytes("W" + '\n');
+				System.out.println("TO SERVER hashWrong");
+			}
+		}
 		
 		outToServer.writeBytes("X" + '\n');
 		System.out.println("TO SERVER End");

@@ -5,14 +5,20 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Server {
+	
+	public static PrintWriter fileOut = null;
 
 	public final static int SERVER_PORT = 8000;
 	private static ServerThread[] threads;
 	private final static int MAX_CONNECTIONS = 25;
 	public static int numberConnections = 0;
 	public final static String FILE_DIR = "./files/";
+	public final static String LOGS_DIR = "./logs/";
 
 	public static File fileToSend = null;
 	public static int simultaneousClients = 25;
@@ -24,7 +30,9 @@ public class Server {
 		serverProtocol(socket);
 		while(true){
 			if(succesfullFilesSent == simultaneousClients){
+				fileOut.close();
 				succesfullFilesSent = 0;
+				numberConnections = 0;
 				System.out.println();
 				serverProtocol(socket);
 			}
@@ -38,6 +46,14 @@ public class Server {
 	}
 
 	public static void serverProtocol(ServerSocket socket) throws Exception{
+		DateFormat fileName = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+		Date date = new Date();
+		System.out.println("LogFile: " + fileName.format(date));
+		
+		fileOut= new PrintWriter(new FileWriter(new File(LOGS_DIR + fileName.format(date) + ".txt")), false);
+		fileOut.println("Date: " + new SimpleDateFormat("yyyy/MM/dd").format(date) +
+				"time: " + new SimpleDateFormat("HH:mm:ss").format(date));
+		
 		BufferedReader serverIn = new BufferedReader(new InputStreamReader(System.in));
 
 		/*
@@ -62,6 +78,7 @@ public class Server {
 			if(chosenFile==1 || chosenFile ==2){
 				fileToSend = fileNames[chosenFile -1];
 				System.out.println("FileChosen: " + fileToSend.getName() + "\n");
+				fileOut.println("FileChosen: " + fileToSend.getName() + "size: " + fileToSend.length());
 				break;
 			}
 			else{
@@ -134,5 +151,6 @@ public class Server {
 		for (int i = 0; i < threads.length; i++) {
 			threads[i].sendFile = true;
 		}
+		
 	}
 }

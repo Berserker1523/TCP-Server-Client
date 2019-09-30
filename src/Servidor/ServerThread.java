@@ -17,6 +17,8 @@ public class ServerThread extends Thread {
 	private boolean hello = false;
 	public boolean sendFile = false;
 	public boolean end = false;
+	private long startFileTransferTime = 0;
+	private long endFileTransferTime = 0;
 
 	public ServerThread(int i) {
 		this.id = i;
@@ -39,6 +41,7 @@ public class ServerThread extends Thread {
 	public void run() {
 		try {	
 			log("Connection");
+			Server.fileOut.println("Connection to client: " + id);
 			String clientSentence = "";
 			while(true){
 				if(!hello){
@@ -65,15 +68,64 @@ public class ServerThread extends Thread {
 				else if(sendFile == true){
 					writeFile2Client(Server.fileToSend);
 					
+					clientSentence = inFromClient.readLine();
+					if (clientSentence == null) {
+						break;
+					}
+					else {
+						endFileTransferTime = System.currentTimeMillis();
+						String[] splitBySpace = clientSentence.split(" ");
+						String command = splitBySpace[0];
+						String param = "";
+						if (splitBySpace.length != 1){ 
+							param = splitBySpace[1];
+						}
+
+						log("IN: " + command + " " + param);
+
+						if(command.equals("R")){
+							long transferTime = (endFileTransferTime - startFileTransferTime);
+							log("The client has received the file");
+							log("Transfer time: "  + transferTime + "ms");
+							Server.fileOut.println("File sent succesfully to client: " + id);
+							Server.fileOut.println("Transfer time of " + id + ": " + transferTime + "ms");
+						}
+					}
+					
 					File sent = new File(Server.fileToSend.getAbsolutePath());
 					//Use MD5 algorithm
 					MessageDigest md5Digest = MessageDigest.getInstance("MD5");
 					
 					//Get the checksum
 					String checksum = getFileChecksum(md5Digest, sent);
-					System.out.println("Server hash: " + checksum);
+					log("Server hash: " + checksum);
 					
 					outToClient.writeBytes(checksum + "\n");
+					
+					clientSentence = inFromClient.readLine();
+					if (clientSentence == null) {
+						break;
+					}
+					else {
+						String[] splitBySpace = clientSentence.split(" ");
+						String command = splitBySpace[0];
+						String param = "";
+						if (splitBySpace.length != 1){ 
+							param = splitBySpace[1];
+						}
+
+						log("IN: " + command + " " + param);
+
+						if(command.equals("E")){
+							log("Hash is equal to the received file");
+							Server.fileOut.println("File integrity maintained: " + id);
+							
+						}
+						else if(command.equals("W")){
+							log("Hash is NOT equal to the received file");
+							Server.fileOut.println("File integrity was not maintained: " + id);
+						}
+					}
 					
 					clientSentence = inFromClient.readLine();
 					if (clientSentence == null) {
@@ -120,6 +172,7 @@ public class ServerThread extends Thread {
 
 			int count;
 			byte[] buffer = new byte[512];
+			startFileTransferTime = System.currentTimeMillis();
 			while ((count=fis.read(buffer)) > 0) {
 				outToClient.write(buffer, 0, count);
 			}
