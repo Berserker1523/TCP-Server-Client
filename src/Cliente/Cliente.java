@@ -72,7 +72,7 @@ public class Cliente {
 		FileOutputStream fos = new FileOutputStream( new File("./downloads/"+ nameFile));
 		System.out.println("START SAVE FILE");
 
-		byte[] buffer = new byte[512];
+		byte[] buffer = new byte[65535];
 
 		int filesize = Integer.parseInt(size); // Send file size in separate msg
 		int read = 0;

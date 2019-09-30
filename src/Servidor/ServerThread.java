@@ -171,7 +171,7 @@ public class ServerThread extends Thread {
 			FileInputStream fis = new FileInputStream(file2send);
 
 			int count;
-			byte[] buffer = new byte[512];
+			byte[] buffer = new byte[65535];
 			startFileTransferTime = System.currentTimeMillis();
 			while ((count=fis.read(buffer)) > 0) {
 				outToClient.write(buffer, 0, count);
