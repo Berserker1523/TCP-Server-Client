@@ -6,8 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
-
 public class Server {
 
 	public final static int SERVER_PORT = 8000;

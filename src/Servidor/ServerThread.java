@@ -15,6 +15,7 @@ public class ServerThread extends Thread {
 	private DataOutputStream outToClient = null;
 	private boolean hello = false;
 	public boolean sendFile = false;
+	public boolean end = false;
 
 	public ServerThread(int i) {
 		this.id = i;
@@ -53,24 +54,37 @@ public class ServerThread extends Thread {
 						}
 
 						log("IN: " + command + " " + param);
-						
+
 						if(command.equals("H")){
 							outToClient.writeBytes("H\n");
 							hello=true;
-						}
-						else if(command.equals("X")){
-							outToClient.writeBytes("X\n");
-							break;
-						}
-						else{
-							outToClient.writeBytes("E CommandNotRecognized\n");
 						}
 					}
 				}
 				else if(sendFile == true){
 					writeFile2Client(Server.fileToSend);
-					break;
+					clientSentence = inFromClient.readLine();
+					if (clientSentence == null) {
+						break;
+					}
+					else {
+						String[] splitBySpace = clientSentence.split(" ");
+						String command = splitBySpace[0];
+						String param = "";
+						if (splitBySpace.length != 1){ 
+							param = splitBySpace[1];
+						}
+
+						log("IN: " + command + " " + param);
+
+						if(command.equals("X")){
+							log("Ending File Transfer");
+							Server.addSuccesfullFilesSent();
+							break;
+						}
+					}
 				}
+
 			}//end_while
 
 			clientSocket.close();
@@ -97,13 +111,9 @@ public class ServerThread extends Thread {
 			while ((count=fis.read(buffer)) > 0) {
 				outToClient.write(buffer, 0, count);
 			}
-			log("Termino");
 			fis.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		finally{
-			Server.addSuccesfullFilesSent();
 		}
 	}
 

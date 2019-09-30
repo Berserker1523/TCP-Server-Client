@@ -14,20 +14,20 @@ import Servidor.Server;
 public class Cliente {
 
 	private final static String SERVER_ADDRESS = "localhost";
+	private static DataOutputStream outToServer = null;
+	private static BufferedReader inFromServer = null;
 
 	public static void main(String argv[]) throws Exception {
-		String console;
 		String fromServer;
 		boolean termino =false;
 
-		BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
 		Socket clientSocket = new Socket(SERVER_ADDRESS, Server.SERVER_PORT);
 
-		DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-		BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+		outToServer = new DataOutputStream(clientSocket.getOutputStream());
+		inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
 		outToServer.writeBytes("H" + '\n');
-		System.out.println("TO SERVER HOLA");
+		System.out.println("TO SERVER Hello");
 
 		fromServer = inFromServer.readLine();
 		System.out.println("FROM SERVER: " + fromServer);
@@ -49,24 +49,13 @@ public class Cliente {
 				}
 			}
 			System.out.println("Server command: " + serverCommand);
-			System.out.println("Params: " + param1 +" 2 " +param2);
+			System.out.println("Params: " + param1 + " 2 " +param2);
 
 
 			switch(serverCommand) {
-			case "X":
-				clientSocket.close();
-				System.out.println("TERMINADO");
-				termino = true;
-				break;
-
 			case "F":
 				saveFile(clientSocket, param1, param2);
-				System.out.println("TERMINO F");
-				outToServer.writeBytes("X" + '\n');
-				break;
-
-			case "E":
-				System.out.println("FROM SERVER ERROR: " + param1);
+				termino = true;
 				break;
 			}
 		}
@@ -93,7 +82,11 @@ public class Cliente {
 			fos.write(buffer, 0, read);
 		}
 		
-		System.out.println("DONE ");
+		
+		System.out.println("DONE File Transfer ");
+		
+		outToServer.writeBytes("X" + '\n');
+		System.out.println("TO SERVER End");
 
 		fos.close();
 		dis.close();
