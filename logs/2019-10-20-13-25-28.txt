@@ -1,0 +1,10 @@
+Date: 2019/10/20time: 13:25:28
+FileChosen: Ayuwoki.mp4size: 121220030
+Connection to client: 0
+Connection to client: 1
+File sent succesfully to client: 1
+Transfer time of 1: 3610ms
+File sent succesfully to client: 0
+Transfer time of 0: 3650ms
+File integrity maintained: 0
+File integrity maintained: 1

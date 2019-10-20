@@ -122,6 +122,7 @@ public class Server {
 		while (numberConnections<simultaneousClients) {
 			numberConnections = 0;
 			Socket connectionSocket = socket.accept();
+			//System.out.println(connectionSocket.getLocalPort());
 			ServerThread freeThread = null;
 
 			/*
